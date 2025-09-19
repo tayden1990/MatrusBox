@@ -1,0 +1,29 @@
+{
+  "name": "matrus-monorepo",
+  "version": "1.0.0",
+  "description": "AI-powered Leitner System for spaced repetition learning",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "type-check": "turbo run type-check",
+    "clean": "turbo run clean",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.0",
+    "prettier": "^3.0.3",
+    "ts-node": "^10.9.1",
+    "turbo": "latest",
+    "typescript": "^5.2.2"
+  },
+  "packageManager": "pnpm@8.7.0",
+  "engines": {
+    "node": ">=18"
+  }
+}

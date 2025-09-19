@@ -1,0 +1,172 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String    @id @default(uuid())
+  email             String?   @unique
+  telegramId        String?   @unique
+  username          String?
+  firstName         String?
+  lastName          String?
+  hashedPassword    String?
+  isEmailVerified   Boolean   @default(false)
+  emailVerifyToken  String?
+  passwordResetToken String?
+  passwordResetExpires DateTime?
+  locale            String    @default("en")
+  timezone          String    @default("UTC")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  lastLoginAt       DateTime?
+
+  // Relations
+  cards             Card[]
+  leitnerCards      LeitnerCard[]
+  studySessions     StudySession[]
+  pronunciationResults PronunciationResult[]
+  settings          UserSettings?
+  
+  @@map("users")
+}
+
+model UserSettings {
+  id                    String  @id @default(uuid())
+  userId                String  @unique
+  dailyGoal             Int     @default(20)
+  enableNotifications   Boolean @default(true)
+  enableSounds          Boolean @default(true)
+  studyReminders        Json    @default("[]") // Array of reminder times
+  preferredLanguage     String  @default("en")
+  difficultyPreference  String  @default("adaptive") // "easy", "medium", "hard", "adaptive"
+  
+  user                  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("user_settings")
+}
+
+model Card {
+  id                String    @id @default(uuid())
+  userId            String
+  front             String
+  back              String
+  explanation       String?
+  exampleSentences  Json      @default("[]") // Array of example sentences
+  tags              String[]  @default([])
+  media             Json?     // {audio: "url", image: "url"}
+  difficulty        Int       @default(1) // 1-5 scale
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  // Relations
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  leitnerCard       LeitnerCard?
+  pronunciationResults PronunciationResult[]
+  
+  @@map("cards")
+}
+
+model LeitnerCard {
+  id                String    @id @default(uuid())
+  cardId            String    @unique
+  userId            String
+  boxLevel          Int       @default(1) // 1-5 (or configurable)
+  easeFactor        Float     @default(2.5) // SM-2 algorithm ease factor
+  interval          Int       @default(1) // Days until next review
+  repetitions       Int       @default(0)
+  lastReviewedAt    DateTime?
+  nextReviewAt      DateTime  @default(now())
+  totalReviews      Int       @default(0)
+  correctReviews    Int       @default(0)
+  consecutiveCorrect Int      @default(0)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  // Relations
+  card              Card      @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("leitner_cards")
+}
+
+model StudySession {
+  id                String    @id @default(uuid())
+  userId            String
+  startedAt         DateTime  @default(now())
+  endedAt           DateTime?
+  cardsAttempted    Int       @default(0)
+  cardsCorrect      Int       @default(0)
+  totalTimeSpent    Int       @default(0) // in seconds
+  sessionType       String    @default("review") // "review", "new", "mixed"
+  
+  // Relations
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  answers           StudyAnswer[]
+  
+  @@map("study_sessions")
+}
+
+model StudyAnswer {
+  id                String    @id @default(uuid())
+  sessionId         String
+  cardId            String
+  userAnswer        String?
+  isCorrect         Boolean
+  timeSpent         Int       // in seconds
+  difficulty        Int?      // User-rated difficulty (1-5)
+  answeredAt        DateTime  @default(now())
+  
+  // Relations
+  session           StudySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  @@map("study_answers")
+}
+
+model PronunciationResult {
+  id                String    @id @default(uuid())
+  userId            String
+  cardId            String
+  audioUrl          String?
+  score             Float?    // 0-100
+  feedback          String?
+  recordedAt        DateTime  @default(now())
+  
+  // Relations
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card              Card      @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  
+  @@map("pronunciation_results")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  @@map("refresh_tokens")
+}
+
+model AIGeneration {
+  id           String   @id @default(uuid())
+  userId       String?
+  cardId       String?
+  requestType  String   // "example", "explanation", "pronunciation", etc.
+  prompt       String
+  response     String
+  model        String   @default("gpt-3.5-turbo")
+  tokensUsed   Int?
+  cost         Float?
+  generatedAt  DateTime @default(now())
+  
+  @@map("ai_generations")
+}

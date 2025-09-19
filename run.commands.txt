@@ -1,0 +1,2 @@
+cd E:\my-final-app\MatrusBox\apps\api; npx ts-node -r tsconfig-paths/register src/main.ts
+cd E:\my-final-app\MatrusBox\apps\web; npm run dev

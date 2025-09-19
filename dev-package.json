@@ -1,0 +1,27 @@
+{
+  "name": "matrusbox-dev-commands",
+  "version": "1.0.0",
+  "description": "Development scripts for MatrusBox",
+  "scripts": {
+    "dev": "node dev-manager.js",
+    "dev:api": "pnpm --filter=@matrus/api dev",
+    "dev:web": "pnpm --filter=@matrus/web dev", 
+    "dev:mobile": "pnpm --filter=@matrus/mobile dev",
+    "dev:database": "docker-compose up -d postgres redis",
+    "dev:all": "concurrently \"npm run dev:database\" \"npm run dev:api\" \"npm run dev:web\"",
+    "test:api": "node test-all-features.js",
+    "test:comprehensive": "node comprehensive-test.js",
+    "test:all": "npm run test:api && npm run test:comprehensive",
+    "logs:api": "docker-compose logs -f api",
+    "logs:web": "docker-compose logs -f web", 
+    "logs:database": "docker-compose logs -f postgres redis",
+    "logs:all": "docker-compose logs -f",
+    "db:reset": "docker-compose down -v && docker-compose up -d postgres redis && sleep 10 && pnpm --filter=@matrus/api run db:migrate",
+    "db:migrate": "pnpm --filter=@matrus/api run db:migrate",
+    "db:studio": "pnpm --filter=@matrus/api run db:studio",
+    "clean": "rm -rf apps/web/.next apps/api/dist node_modules/.cache",
+    "setup": "pnpm install && npm run dev:database && sleep 10 && npm run db:migrate",
+    "status": "node status-checker.js",
+    "stop": "docker-compose stop && pkill -f 'node.*matrus'"
+  }
+}
