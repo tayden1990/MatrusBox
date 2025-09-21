@@ -47,6 +47,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Generate Prisma Client (API)
+        run: pnpm --filter @matrus/api db:generate
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/postgres?schema=public
+
       - name: Type check
         run: pnpm type-check
 
@@ -77,6 +82,11 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client (API)
+        run: pnpm --filter @matrus/api db:generate
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/postgres?schema=public
 
       - name: Build packages
         run: pnpm build --filter="./packages/*"
@@ -197,6 +207,7 @@ jobs:
 
       - name: Setup Expo
         uses: expo/expo-github-action@v8
+        if: ${{ secrets.EXPO_TOKEN != '' }}
         with:
           expo-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
@@ -206,6 +217,7 @@ jobs:
 
       - name: Build mobile app
         working-directory: apps/mobile
+        if: ${{ secrets.EXPO_TOKEN != '' }}
         run: |
           echo "Mobile build would use EAS Build:"
           echo "eas build --platform android --non-interactive"
