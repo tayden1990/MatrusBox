@@ -32,14 +32,15 @@ jobs:
           version: ${{ env.PNPM_VERSION }}
 
       - name: Get pnpm store directory
+        id: pnpm-store
         shell: bash
         run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+          echo "store_path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
         uses: actions/cache@v3
         with:
-          path: ${{ env.STORE_PATH }}
+          path: ${{ steps.pnpm-store.outputs.store_path }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
@@ -121,11 +122,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+      # Docker login skipped until secrets are configured
+      # - name: Login to Docker Hub
+      #   uses: docker/login-action@v3
+      #   with:
+      #     username: ${{ secrets.DOCKER_USERNAME }}
+      #     password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Extract metadata
         id: meta
@@ -138,12 +140,12 @@ jobs:
             type=sha,prefix={{branch}}-
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Build and push Docker image
+      - name: Build Docker image (no push)
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./apps/${{ matrix.app }}/Dockerfile
-          push: true
+          push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
@@ -154,7 +156,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [docker]
     if: github.ref == 'refs/heads/main'
-    environment: production
+  # environment: production
     
     steps:
       - name: Checkout code
@@ -188,8 +190,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     if: github.ref == 'refs/heads/main'
-    env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    # EXPO build requires EXPO_TOKEN secret; steps are placeholders until configured
     
     steps:
       - name: Checkout code
@@ -205,24 +206,12 @@ jobs:
         with:
           version: ${{ env.PNPM_VERSION }}
 
-      - name: Install Yarn (classic)
-        run: npm install -g yarn@1.22.19
-
-      - name: Setup Expo
-        uses: expo/expo-github-action@v8
-        if: ${{ env.EXPO_TOKEN != '' }}
-        with:
-          expo-version: latest
-          token: ${{ env.EXPO_TOKEN }}
+      - name: Prepare mobile build (skipped)
+        run: echo "Skipping Expo setup until EXPO_TOKEN is configured."
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build mobile app
+      - name: Build mobile app (skipped)
         working-directory: apps/mobile
-        if: ${{ env.EXPO_TOKEN != '' }}
-        run: |
-          echo "Mobile build would use EAS Build:"
-          echo "eas build --platform android --non-interactive"
-          echo "eas build --platform ios --non-interactive"
-          echo "Requires EAS CLI and project configuration"
+        run: echo "Mobile build is handled via EAS and requires secrets. Skipping."
