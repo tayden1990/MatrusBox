@@ -93,6 +93,7 @@ jobs:
 
       - name: Build applications
         run: pnpm build --filter="./apps/*"
+        # Note: Mobile app build is handled by the 'mobile-build' job via Expo/EAS. The mobile package build script is a no-op here.
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
