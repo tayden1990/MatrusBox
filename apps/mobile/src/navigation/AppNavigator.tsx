@@ -1,12 +1,12 @@
-import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
-import { View, Text } from 'react-native';
+import React from "react";
+import { createStackNavigator } from "@react-navigation/stack";
+import { View, Text } from "react-native";
 
 const Stack = createStackNavigator();
 
 function HomeScreen() {
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Text>Matrus Mobile Home</Text>
     </View>
   );

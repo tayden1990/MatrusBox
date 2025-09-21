@@ -3,47 +3,47 @@ import { ApiProperty } from '@nestjs/swagger';
 import { NotificationChannel } from '../../common/utils/notification.service';
 
 export class SendNotificationDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'ID of the user to send the notification to',
-    example: 'user-123-uuid-456'
+    example: 'user-123-uuid-456',
   })
   @IsString()
   userId: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Message content to send',
-    example: 'Your daily study reminder: Practice your flashcards!'
+    example: 'Your daily study reminder: Practice your flashcards!',
   })
   @IsString()
   message: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Notification delivery channel',
     enum: ['email', 'telegram', 'push'],
-    example: 'push'
+    example: 'push',
   })
   @IsEnum(['email', 'telegram', 'push'])
   channel: NotificationChannel;
 }
 
 export class NotificationResponseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Indicates if the notification was sent successfully',
-    example: true
+    example: true,
   })
   success: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'The channel used for notification delivery',
     enum: ['email', 'telegram', 'push'],
-    example: 'push'
+    example: 'push',
   })
   channel: NotificationChannel;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Error message if notification failed',
     example: 'Invalid email address',
-    required: false
+    required: false,
   })
   error?: string;
 }

@@ -1,7 +1,7 @@
-import { Telegraf, Context, Markup } from 'telegraf';
-import { ApiService } from './services/api.service';
-import { Logger } from './utils/logger';
-import { RedisService } from './services/redis.service';
+import { Telegraf, Context, Markup } from "telegraf";
+import { ApiService } from "./services/api.service";
+import { Logger } from "./utils/logger";
+import { RedisService } from "./services/redis.service";
 
 export interface BotContext extends Context {
   session?: {
@@ -23,9 +23,13 @@ export class MatrusBot {
 
   constructor() {
     const token = process.env.TELEGRAM_BOT_TOKEN;
-    if (!token || token === 'demo-mode-no-real-token-needed') {
-      console.log('🤖 Starting Telegram bot in DEMO mode (no real token provided)');
-      console.log('📝 Bot will simulate functionality without connecting to Telegram API');
+    if (!token || token === "demo-mode-no-real-token-needed") {
+      console.log(
+        "🤖 Starting Telegram bot in DEMO mode (no real token provided)",
+      );
+      console.log(
+        "📝 Bot will simulate functionality without connecting to Telegram API",
+      );
       // Use a fake token for demo mode
       this.bot = null; // Will be handled in demo mode
     } else {
@@ -48,11 +52,11 @@ export class MatrusBot {
     this.bot!.use(async (ctx, next) => {
       const sessionKey = `session:${ctx.from?.id}`;
       const sessionData = await this.redis.get(sessionKey);
-      
+
       ctx.session = sessionData ? JSON.parse(sessionData) : {};
-      
+
       await next();
-      
+
       // Save session after processing
       await this.redis.set(sessionKey, JSON.stringify(ctx.session), 3600); // 1 hour TTL
     });
@@ -60,53 +64,60 @@ export class MatrusBot {
     // Logging middleware
     this.bot!.use((ctx, next) => {
       const msg: any = (ctx as any).message;
-      const text = msg && typeof msg === 'object' && 'text' in msg ? msg.text : undefined;
-      this.logger.info(`Received update from ${ctx.from?.id}: ${text || ctx.updateType}`);
+      const text =
+        msg && typeof msg === "object" && "text" in msg ? msg.text : undefined;
+      this.logger.info(
+        `Received update from ${ctx.from?.id}: ${text || ctx.updateType}`,
+      );
       return next();
     });
   }
 
   private setupCommands() {
     // Start command
-  this.bot!.command('start', async (ctx) => {
+    this.bot!.command("start", async (ctx) => {
       const telegramId = ctx.from?.id.toString();
       const firstName = ctx.from?.first_name;
-      const username = ctx.from?.username;
 
       try {
         // Check if user exists
         const user = await this.apiService.getUserByTelegramId(telegramId);
-        
+
         if (user) {
           ctx.session!.userId = user.id;
           await ctx.reply(
             `Welcome back, ${firstName}! 🎉\\n\\n` +
-            `Ready to continue your learning journey?`,
-            this.getMainMenuKeyboard()
+              `Ready to continue your learning journey?`,
+            this.getMainMenuKeyboard(),
           );
         } else {
           // New user registration
           await ctx.reply(
             `Hi ${firstName}! 👋\\n\\n` +
-            `Welcome to Matrus - your AI-powered language learning companion!\\n\\n` +
-            `I'll help you learn with smart flashcards and spaced repetition. ` +
-            `Let's get you set up!`,
+              `Welcome to Matrus - your AI-powered language learning companion!\\n\\n` +
+              `I'll help you learn with smart flashcards and spaced repetition. ` +
+              `Let's get you set up!`,
             Markup.inlineKeyboard([
-              [Markup.button.callback('📚 Start Learning', 'register')],
-              [Markup.button.webApp('🌐 Open Web App', process.env.WEB_APP_URL || 'https://matrus.app')]
-            ])
+              [Markup.button.callback("📚 Start Learning", "register")],
+              [
+                Markup.button.webApp(
+                  "🌐 Open Web App",
+                  process.env.WEB_APP_URL || "https://matrus.app",
+                ),
+              ],
+            ]),
           );
         }
       } catch (error) {
-        this.logger.error('Error in start command:', error);
-        await ctx.reply('Sorry, something went wrong. Please try again later.');
+        this.logger.error("Error in start command:", error);
+        await ctx.reply("Sorry, something went wrong. Please try again later.");
       }
     });
 
     // Today's cards
-  this.bot!.command('study', async (ctx) => {
+    this.bot!.command("study", async (ctx) => {
       if (!ctx.session?.userId) {
-        await ctx.reply('Please use /start to set up your account first.');
+        await ctx.reply("Please use /start to set up your account first.");
         return;
       }
 
@@ -115,9 +126,9 @@ export class MatrusBot {
 
         if (cards.length === 0) {
           await ctx.reply(
-            '🎉 All done for today! You\'ve completed all your scheduled reviews.\n\n' +
-              'Great job! Come back tomorrow for more cards.',
-            this.getMainMenuKeyboard()
+            "🎉 All done for today! You've completed all your scheduled reviews.\n\n" +
+              "Great job! Come back tomorrow for more cards.",
+            this.getMainMenuKeyboard(),
           );
           return;
         }
@@ -126,51 +137,61 @@ export class MatrusBot {
           `� You have ${cards.length} cards to review today!\n\n` +
             "Choose how you'd like to study:",
           Markup.inlineKeyboard([
-            [Markup.button.callback('🤖 Quick Quiz (Bot)', 'quick_quiz')],
-            [Markup.button.webApp('🌐 Full Study Session', `${process.env.WEB_APP_URL}/study`)],
-            [Markup.button.callback('📊 View Progress', 'progress')]
-          ])
+            [Markup.button.callback("🤖 Quick Quiz (Bot)", "quick_quiz")],
+            [
+              Markup.button.webApp(
+                "🌐 Full Study Session",
+                `${process.env.WEB_APP_URL}/study`,
+              ),
+            ],
+            [Markup.button.callback("📊 View Progress", "progress")],
+          ]),
         );
       } catch (error) {
-        this.logger.error('Error in study command:', error);
+        this.logger.error("Error in study command:", error);
         await ctx.reply("Sorry, couldn't load your cards. Please try again.");
       }
     });
 
     // Progress command
-  this.bot!.command('progress', async (ctx) => this.handleProgress(ctx));
+    this.bot!.command("progress", async (ctx) => this.handleProgress(ctx));
 
     // Help command
-  this.bot!.command('help', async (ctx) => {
+    this.bot!.command("help", async (ctx) => {
       await ctx.reply(
         `🤖 **Matrus Bot Commands**\\n\\n` +
-        `/start - Welcome & setup\\n` +
-        `/study - Today's flashcards\\n` +
-        `/progress - View your stats\\n` +
-        `/settings - Adjust preferences\\n` +
-        `/help - Show this help\\n\\n` +
-        `💡 **Tips:**\\n` +
-        `• Use the web app for the full experience\\n` +
-        `• Study daily for best results\\n` +
-        `• The AI adapts to your learning pace`,
-        { parse_mode: 'Markdown' }
+          `/start - Welcome & setup\\n` +
+          `/study - Today's flashcards\\n` +
+          `/progress - View your stats\\n` +
+          `/settings - Adjust preferences\\n` +
+          `/help - Show this help\\n\\n` +
+          `💡 **Tips:**\\n` +
+          `• Use the web app for the full experience\\n` +
+          `• Study daily for best results\\n` +
+          `• The AI adapts to your learning pace`,
+        { parse_mode: "Markdown" },
       );
     });
 
     // Settings command
-  this.bot!.command('settings', async (ctx) => {
+    this.bot!.command("settings", async (ctx) => {
       await ctx.reply(
-        'Settings coming soon! For now, use the web app to customize your experience.',
+        "Settings coming soon! For now, use the web app to customize your experience.",
         Markup.inlineKeyboard([
-          [Markup.button.webApp('🌐 Open Settings', `${process.env.WEB_APP_URL}/settings`)]
-        ])
+          [
+            Markup.button.webApp(
+              "🌐 Open Settings",
+              `${process.env.WEB_APP_URL}/settings`,
+            ),
+          ],
+        ]),
       );
     });
   }
 
   private setupActions() {
     // Registration action
-  this.bot!.action('register', async (ctx) => {
+    this.bot!.action("register", async (ctx) => {
       const telegramId = ctx.from?.id.toString();
       const firstName = ctx.from?.first_name;
       const lastName = ctx.from?.last_name;
@@ -188,27 +209,29 @@ export class MatrusBot {
 
         await ctx.editMessageText(
           `Welcome to Matrus, ${firstName}! 🎉\\n\\n` +
-          `Your account is set up and ready. Let's start learning!`,
-          this.getMainMenuKeyboard()
+            `Your account is set up and ready. Let's start learning!`,
+          this.getMainMenuKeyboard(),
         );
       } catch (error) {
-        this.logger.error('Error in registration:', error);
-        await ctx.editMessageText('Sorry, registration failed. Please try again.');
+        this.logger.error("Error in registration:", error);
+        await ctx.editMessageText(
+          "Sorry, registration failed. Please try again.",
+        );
       }
     });
 
     // Quick quiz action
-  this.bot!.action('quick_quiz', async (ctx) => {
+    this.bot!.action("quick_quiz", async (ctx) => {
       if (!ctx.session?.userId) {
-        await ctx.answerCbQuery('Please register first');
+        await ctx.answerCbQuery("Please register first");
         return;
       }
 
       try {
         const cards = await this.apiService.getTodaysCards(ctx.session.userId);
-        
+
         if (cards.length === 0) {
-          await ctx.editMessageText('No cards to review right now!');
+          await ctx.editMessageText("No cards to review right now!");
           return;
         }
 
@@ -220,27 +243,27 @@ export class MatrusBot {
 
         await ctx.editMessageText(
           `📚 **Card ${1}/${cards.length}**\\n\\n` +
-          `**${card.front}**\\n\\n` +
-          `Think of the answer, then reveal it:`,
+            `**${card.front}**\\n\\n` +
+            `Think of the answer, then reveal it:`,
           {
-            parse_mode: 'Markdown',
+            parse_mode: "Markdown",
             ...Markup.inlineKeyboard([
-              [Markup.button.callback('👁️ Reveal Answer', 'reveal_answer')],
-              [Markup.button.callback('❌ Stop Quiz', 'stop_quiz')]
-            ])
-          }
+              [Markup.button.callback("👁️ Reveal Answer", "reveal_answer")],
+              [Markup.button.callback("❌ Stop Quiz", "stop_quiz")],
+            ]),
+          },
         );
       } catch (error) {
-        this.logger.error('Error starting quiz:', error);
-        await ctx.editMessageText('Failed to start quiz. Please try again.');
+        this.logger.error("Error starting quiz:", error);
+        await ctx.editMessageText("Failed to start quiz. Please try again.");
       }
     });
 
     // Reveal answer action
-  this.bot!.action('reveal_answer', async (ctx) => {
+    this.bot!.action("reveal_answer", async (ctx) => {
       const card = ctx.session?.currentCard;
       if (!card) {
-        await ctx.answerCbQuery('No active card');
+        await ctx.answerCbQuery("No active card");
         return;
       }
 
@@ -249,43 +272,43 @@ export class MatrusBot {
 
       await ctx.editMessageText(
         `📚 **Card ${index + 1}/${cards.length}**\\n\\n` +
-        `**${card.front}**\\n\\n` +
-        `**Answer:** ${card.back}\\n\\n` +
-        `How did you do?`,
+          `**${card.front}**\\n\\n` +
+          `**Answer:** ${card.back}\\n\\n` +
+          `How did you do?`,
         {
-          parse_mode: 'Markdown',
+          parse_mode: "Markdown",
           ...Markup.inlineKeyboard([
             [
-              Markup.button.callback('✅ Correct', 'answer_correct'),
-              Markup.button.callback('❌ Wrong', 'answer_wrong')
+              Markup.button.callback("✅ Correct", "answer_correct"),
+              Markup.button.callback("❌ Wrong", "answer_wrong"),
             ],
-            [Markup.button.callback('🔄 Skip', 'answer_skip')],
-            [Markup.button.callback('❌ Stop Quiz', 'stop_quiz')]
-          ])
-        }
+            [Markup.button.callback("🔄 Skip", "answer_skip")],
+            [Markup.button.callback("❌ Stop Quiz", "stop_quiz")],
+          ]),
+        },
       );
     });
 
     // Answer actions
-  this.bot!.action(/answer_(correct|wrong|skip)/, async (ctx) => {
-      const action = ctx.match![1] as 'correct' | 'wrong' | 'skip';
+    this.bot!.action(/answer_(correct|wrong|skip)/, async (ctx) => {
+      const action = ctx.match![1] as "correct" | "wrong" | "skip";
       const card = ctx.session?.currentCard;
-      
+
       if (!card || !ctx.session?.userId) {
-        await ctx.answerCbQuery('Session error');
+        await ctx.answerCbQuery("Session error");
         return;
       }
 
       // Submit answer to API
-      if (action !== 'skip') {
+      if (action !== "skip") {
         try {
           await this.apiService.submitAnswer(ctx.session.userId, {
             cardId: card.id,
-            isCorrect: action === 'correct',
+            isCorrect: action === "correct",
             timeSpent: 5, // Estimate for bot quiz
           });
         } catch (error) {
-          this.logger.error('Error submitting answer:', error);
+          this.logger.error("Error submitting answer:", error);
         }
       }
 
@@ -297,14 +320,14 @@ export class MatrusBot {
         // Quiz complete
         await ctx.editMessageText(
           `🎉 **Quiz Complete!**\\n\\n` +
-          `You've reviewed ${cards.length} cards. Great job!\\n\\n` +
-          `Keep up the daily practice for best results.`,
+            `You've reviewed ${cards.length} cards. Great job!\\n\\n` +
+            `Keep up the daily practice for best results.`,
           {
-            parse_mode: 'Markdown',
-            ...this.getMainMenuKeyboard()
-          }
+            parse_mode: "Markdown",
+            ...this.getMainMenuKeyboard(),
+          },
         );
-        
+
         // Clear session data
         delete ctx.session?.currentCard;
         delete ctx.session?.quizCards;
@@ -319,32 +342,32 @@ export class MatrusBot {
 
       await ctx.editMessageText(
         `📚 **Card ${nextIndex + 1}/${cards.length}**\\n\\n` +
-        `**${nextCard.front}**\\n\\n` +
-        `Think of the answer, then reveal it:`,
+          `**${nextCard.front}**\\n\\n` +
+          `Think of the answer, then reveal it:`,
         {
-          parse_mode: 'Markdown',
+          parse_mode: "Markdown",
           ...Markup.inlineKeyboard([
-            [Markup.button.callback('👁️ Reveal Answer', 'reveal_answer')],
-            [Markup.button.callback('❌ Stop Quiz', 'stop_quiz')]
-          ])
-        }
+            [Markup.button.callback("👁️ Reveal Answer", "reveal_answer")],
+            [Markup.button.callback("❌ Stop Quiz", "stop_quiz")],
+          ]),
+        },
       );
     });
 
     // Stop quiz action
-  this.bot!.action('stop_quiz', async (ctx) => {
+    this.bot!.action("stop_quiz", async (ctx) => {
       delete ctx.session?.currentCard;
       delete ctx.session?.quizCards;
       delete ctx.session?.quizIndex;
 
       await ctx.editMessageText(
-        'Quiz stopped. You can continue anytime!',
-        this.getMainMenuKeyboard()
+        "Quiz stopped. You can continue anytime!",
+        this.getMainMenuKeyboard(),
       );
     });
 
     // Progress action
-  this.bot!.action('progress', async (ctx) => {
+    this.bot!.action("progress", async (ctx) => {
       await ctx.answerCbQuery();
       await this.handleProgress(ctx);
     });
@@ -352,7 +375,7 @@ export class MatrusBot {
 
   private async handleProgress(ctx: BotContext) {
     if (!ctx.session?.userId) {
-      await ctx.reply('Please use /start to set up your account first.');
+      await ctx.reply("Please use /start to set up your account first.");
       return;
     }
 
@@ -366,10 +389,10 @@ export class MatrusBot {
           `🔥 Streak: ${stats.streakDays} days\n` +
           `🎯 Accuracy: ${(stats.averageAccuracy * 100).toFixed(1)}%\n` +
           `⏱️ Time Today: ${Math.round(stats.timeStudiedToday / 60)} min`,
-        { parse_mode: 'Markdown', ...this.getMainMenuKeyboard() }
+        { parse_mode: "Markdown", ...this.getMainMenuKeyboard() },
       );
     } catch (error) {
-      this.logger.error('Error in progress command:', error);
+      this.logger.error("Error in progress command:", error);
       await ctx.reply("Sorry, couldn't load your progress. Please try again.");
     }
   }
@@ -377,28 +400,37 @@ export class MatrusBot {
   private getMainMenuKeyboard() {
     return Markup.inlineKeyboard([
       [
-        Markup.button.callback('📚 Study', 'study'),
-        Markup.button.callback('📊 Progress', 'progress')
+        Markup.button.callback("📚 Study", "study"),
+        Markup.button.callback("📊 Progress", "progress"),
       ],
-      [Markup.button.webApp('🌐 Open Web App', process.env.WEB_APP_URL || 'https://matrus.app')]
+      [
+        Markup.button.webApp(
+          "🌐 Open Web App",
+          process.env.WEB_APP_URL || "https://matrus.app",
+        ),
+      ],
     ]);
   }
 
   public async start() {
     if (!this.bot) {
       // Demo mode - just simulate bot running
-      this.logger.info('🤖 Telegram Bot running in DEMO mode');
-      console.log('🚀 Demo Bot Features:');
-      console.log('  📋 Commands: /start, /help, /progress, /study');
-      console.log('  🔗 API Integration: Connected to mock API server');
-      console.log('  💾 Redis: Connected for session management');
-      console.log('  ✅ Status: Ready for production deployment with real token');
-      
+      this.logger.info("🤖 Telegram Bot running in DEMO mode");
+      console.log("🚀 Demo Bot Features:");
+      console.log("  📋 Commands: /start, /help, /progress, /study");
+      console.log("  🔗 API Integration: Connected to mock API server");
+      console.log("  💾 Redis: Connected for session management");
+      console.log(
+        "  ✅ Status: Ready for production deployment with real token",
+      );
+
       // Keep the process alive in demo mode
       setInterval(() => {
-        console.log(`🤖 Bot demo heartbeat - ${new Date().toLocaleTimeString()}`);
+        console.log(
+          `🤖 Bot demo heartbeat - ${new Date().toLocaleTimeString()}`,
+        );
       }, 30000);
-      
+
       return;
     }
 
@@ -408,7 +440,7 @@ export class MatrusBot {
     });
 
     // Start bot
-    if (process.env.NODE_ENV === 'production' && process.env.WEBHOOK_URL) {
+    if (process.env.NODE_ENV === "production" && process.env.WEBHOOK_URL) {
       // Webhook mode
       const webhookUrl = `${process.env.WEBHOOK_URL}/telegram/webhook`;
       await this.bot!.telegram.setWebhook(webhookUrl);
@@ -416,12 +448,12 @@ export class MatrusBot {
     } else {
       // Polling mode
       await this.bot!.launch();
-      this.logger.info('Bot started in polling mode');
+      this.logger.info("Bot started in polling mode");
     }
 
     // Graceful shutdown
-    process.once('SIGINT', () => this.bot?.stop('SIGINT'));
-    process.once('SIGTERM', () => this.bot?.stop('SIGTERM'));
+    process.once("SIGINT", () => this.bot?.stop("SIGINT"));
+    process.once("SIGTERM", () => this.bot?.stop("SIGTERM"));
   }
 
   public getWebhookMiddleware() {
@@ -429,6 +461,6 @@ export class MatrusBot {
       // No-op middleware in demo mode
       return (_req: any, _res: any, next: any) => next && next();
     }
-    return this.bot.webhookCallback('/telegram/webhook');
+    return this.bot.webhookCallback("/telegram/webhook");
   }
 }

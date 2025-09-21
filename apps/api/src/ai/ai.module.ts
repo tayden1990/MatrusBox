@@ -3,8 +3,8 @@ import { AIService } from './ai.service';
 import { AIController } from './ai.controller';
 
 @Module({
-	providers: [AIService],
-	controllers: [AIController],
-	exports: [AIService],
+  providers: [AIService],
+  controllers: [AIController],
+  exports: [AIService],
 })
 export class AIModule {}

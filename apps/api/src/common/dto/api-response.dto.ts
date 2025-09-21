@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AuthResponseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Indicates if the operation was successful',
-    example: true
+    example: true,
   })
   success: boolean;
 
@@ -18,12 +18,18 @@ export class AuthResponseDto {
           email: { type: 'string', example: 'user@example.com' },
           firstName: { type: 'string', example: 'John' },
           lastName: { type: 'string', example: 'Doe' },
-          createdAt: { type: 'string', format: 'date-time' }
-        }
+          createdAt: { type: 'string', format: 'date-time' },
+        },
       },
-      accessToken: { type: 'string', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' },
-      refreshToken: { type: 'string', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' }
-    }
+      accessToken: {
+        type: 'string',
+        example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+      },
+      refreshToken: {
+        type: 'string',
+        example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+      },
+    },
   })
   data: {
     user: {
@@ -39,21 +45,21 @@ export class AuthResponseDto {
 }
 
 export class ApiResponseDto<T = any> {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Indicates if the operation was successful',
-    example: true
+    example: true,
   })
   success: boolean;
 
-  @ApiProperty({ 
-    description: 'Response data (structure varies by endpoint)'
+  @ApiProperty({
+    description: 'Response data (structure varies by endpoint)',
   })
   data: T;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Optional metadata for paginated responses',
     required: false,
-    type: 'object'
+    type: 'object',
   })
   meta?: {
     page: number;
@@ -64,15 +70,15 @@ export class ApiResponseDto<T = any> {
 }
 
 export class SuccessResponseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Indicates if the operation was successful',
-    example: true
+    example: true,
   })
   success: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Success message',
-    example: 'Operation completed successfully'
+    example: 'Operation completed successfully',
   })
   message: string;
 }

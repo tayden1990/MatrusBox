@@ -1,8 +1,20 @@
 import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiResponse, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiParam,
+  ApiResponse,
+  ApiBody,
+} from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { UserResponseDto, UserStatsResponseDto, UserSettingsResponseDto, UserSettingsUpdateDto } from './dto/users.dto';
+import {
+  UserResponseDto,
+  UserStatsResponseDto,
+  UserSettingsResponseDto,
+  UserSettingsUpdateDto,
+} from './dto/users.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -12,19 +24,19 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get(':id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get user by ID',
-    description: 'Retrieves detailed user information by user ID'
+    description: 'Retrieves detailed user information by user ID',
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'User ID',
-    example: 'user-123-uuid-456'
+    example: 'user-123-uuid-456',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'User retrieved successfully',
-    type: UserResponseDto
+    type: UserResponseDto,
   })
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -33,19 +45,19 @@ export class UsersController {
   }
 
   @Get('telegram/:telegramId')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get user by Telegram ID',
-    description: 'Retrieves user information using their Telegram ID'
+    description: 'Retrieves user information using their Telegram ID',
   })
-  @ApiParam({ 
-    name: 'telegramId', 
+  @ApiParam({
+    name: 'telegramId',
     description: 'Telegram user ID',
-    example: '123456789'
+    example: '123456789',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'User retrieved successfully',
-    type: UserResponseDto
+    type: UserResponseDto,
   })
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -54,19 +66,20 @@ export class UsersController {
   }
 
   @Get(':id/stats')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get user statistics',
-    description: 'Retrieves comprehensive learning statistics for a user including progress, streaks, and performance metrics'
+    description:
+      'Retrieves comprehensive learning statistics for a user including progress, streaks, and performance metrics',
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'User ID',
-    example: 'user-123-uuid-456'
+    example: 'user-123-uuid-456',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'User statistics retrieved successfully',
-    type: UserStatsResponseDto
+    type: UserStatsResponseDto,
   })
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -79,19 +92,19 @@ export class UsersController {
   }
 
   @Get(':id/settings')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get user settings',
-    description: 'Retrieves user preferences and configuration settings'
+    description: 'Retrieves user preferences and configuration settings',
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'User ID',
-    example: 'user-123-uuid-456'
+    example: 'user-123-uuid-456',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'User settings retrieved successfully',
-    type: UserSettingsResponseDto
+    type: UserSettingsResponseDto,
   })
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -104,29 +117,36 @@ export class UsersController {
   }
 
   @Post(':id/settings')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Update user settings',
-    description: 'Updates user preferences and configuration settings'
+    description: 'Updates user preferences and configuration settings',
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'User ID',
-    example: 'user-123-uuid-456'
+    example: 'user-123-uuid-456',
   })
-  @ApiBody({ 
+  @ApiBody({
     type: UserSettingsUpdateDto,
-    description: 'Settings to update including notifications, language, timezone, and study preferences'
+    description:
+      'Settings to update including notifications, language, timezone, and study preferences',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Settings updated successfully',
-    type: UserSettingsResponseDto
+    type: UserSettingsResponseDto,
   })
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiResponse({ status: 400, description: 'Invalid settings data' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async updateUserSettings(@Param('id') id: string, @Body() settings: UserSettingsUpdateDto) {
-    const updatedSettings = await this.usersService.updateSettings(id, settings);
+  async updateUserSettings(
+    @Param('id') id: string,
+    @Body() settings: UserSettingsUpdateDto
+  ) {
+    const updatedSettings = await this.usersService.updateSettings(
+      id,
+      settings
+    );
     return {
       success: true,
       data: updatedSettings,

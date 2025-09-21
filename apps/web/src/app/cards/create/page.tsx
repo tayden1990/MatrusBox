@@ -650,7 +650,7 @@ export default function CreateCardPage() {
           }}>
             <h3 style={{ marginBottom: '1rem', color: '#333' }}>🤖 AI Card Generation</h3>
             <p style={{ marginBottom: '1.5rem', color: '#666' }}>
-              Let AI generate a flashcard for you! Enter a topic and we'll create a complete card with examples and explanations.
+              Let AI generate a flashcard for you! Enter a topic and we&apos;ll create a complete card with examples and explanations.
             </p>
             
             <form onSubmit={(e) => {

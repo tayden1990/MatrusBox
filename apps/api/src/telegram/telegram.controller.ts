@@ -1,5 +1,11 @@
 import { Controller, Post, Body, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiBody,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { TelegramService } from './telegram.service';
 import { TelegramWebhookDto, MiniAppAuthDto } from './dto/telegram.dto';
@@ -12,13 +18,14 @@ export class TelegramController {
   constructor(private readonly telegramService: TelegramService) {}
 
   @Post('webhook')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Handle Telegram webhook events',
-    description: 'Processes incoming webhook events from Telegram Bot API'
+    description: 'Processes incoming webhook events from Telegram Bot API',
   })
-  @ApiBody({ 
+  @ApiBody({
     type: TelegramWebhookDto,
-    description: 'Telegram webhook payload containing bot updates and user interactions'
+    description:
+      'Telegram webhook payload containing bot updates and user interactions',
   })
   @ApiResponse({ status: 200, description: 'Webhook processed successfully' })
   @ApiResponse({ status: 400, description: 'Invalid webhook data' })
@@ -29,13 +36,14 @@ export class TelegramController {
   }
 
   @Post('mini-app-auth')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Authenticate Telegram mini-app user',
-    description: 'Authenticates users through Telegram mini-app integration'
+    description: 'Authenticates users through Telegram mini-app integration',
   })
-  @ApiBody({ 
+  @ApiBody({
     type: MiniAppAuthDto,
-    description: 'Telegram mini-app authentication data including user ID and authorization payload'
+    description:
+      'Telegram mini-app authentication data including user ID and authorization payload',
   })
   @ApiResponse({ status: 200, description: 'Authentication successful' })
   @ApiResponse({ status: 401, description: 'Authentication failed' })

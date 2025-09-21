@@ -1,9 +1,32 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, Query, UseGuards, Req } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiQuery, ApiParam, ApiBody, ApiResponse } from '@nestjs/swagger';
-import { PaginationQueryDto, getPagination, buildMeta } from '../common/dto/pagination-query.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  Query,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiParam,
+  ApiBody,
+  ApiResponse,
+} from '@nestjs/swagger';
+import { getPagination, buildMeta } from '../common/dto/pagination-query.dto';
 import { formatResponse } from '../common/utils/response.util';
 import { CardsService } from './cards.service';
-import { CreateCardDto, CardResponseDto, CardsListResponseDto } from './dto/create-card.dto';
+import {
+  CreateCardDto,
+  CardResponseDto,
+  CardsListResponseDto,
+} from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Public } from '../auth/decorators/public.decorator';
@@ -18,18 +41,19 @@ export class CardsController {
 
   @Public()
   @Post('demo')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Create a demo card (no auth required)',
-    description: 'Creates a demo flashcard for testing purposes without authentication'
+    description:
+      'Creates a demo flashcard for testing purposes without authentication',
   })
-  @ApiBody({ 
+  @ApiBody({
     type: CreateCardDto,
-    description: 'Card creation details for demo purposes'
+    description: 'Card creation details for demo purposes',
   })
-  @ApiResponse({ 
-    status: 201, 
+  @ApiResponse({
+    status: 201,
     description: 'Demo card created successfully',
-    type: CardResponseDto
+    type: CardResponseDto,
   })
   createDemo(@Body() dto: CreateCardDto) {
     // Return a mock response for demo purposes
@@ -43,25 +67,27 @@ export class CardsController {
       difficulty: dto.difficulty || 3,
       userId: 'demo-user',
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
-    
+
     return formatResponse(mockCard);
   }
 
   @Post()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Create a new card',
-    description: 'Creates a new flashcard with front/back content, optional explanation, examples, and tags'
+    description:
+      'Creates a new flashcard with front/back content, optional explanation, examples, and tags',
   })
-  @ApiBody({ 
+  @ApiBody({
     type: CreateCardDto,
-    description: 'Card creation details including front content, back content, explanation, examples, tags, and difficulty level'
+    description:
+      'Card creation details including front content, back content, explanation, examples, tags, and difficulty level',
   })
-  @ApiResponse({ 
-    status: 201, 
+  @ApiResponse({
+    status: 201,
     description: 'Card created successfully',
-    type: CardResponseDto
+    type: CardResponseDto,
   })
   @ApiResponse({ status: 400, description: 'Invalid card data' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -70,38 +96,39 @@ export class CardsController {
   }
 
   @Get()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'List cards (filterable, paginated)',
-    description: 'Retrieves a paginated list of user cards with optional filtering by tag and search term'
+    description:
+      'Retrieves a paginated list of user cards with optional filtering by tag and search term',
   })
-  @ApiQuery({ 
-    name: 'tag', 
-    required: false, 
+  @ApiQuery({
+    name: 'tag',
+    required: false,
     description: 'Filter cards by tag',
-    example: 'vocabulary'
+    example: 'vocabulary',
   })
-  @ApiQuery({ 
-    name: 'search', 
-    required: false, 
+  @ApiQuery({
+    name: 'search',
+    required: false,
     description: 'Search cards by content',
-    example: 'serendipity'
+    example: 'serendipity',
   })
-  @ApiQuery({ 
-    name: 'page', 
-    required: false, 
+  @ApiQuery({
+    name: 'page',
+    required: false,
     description: 'Page number for pagination',
-    example: '1'
+    example: '1',
   })
-  @ApiQuery({ 
-    name: 'pageSize', 
-    required: false, 
+  @ApiQuery({
+    name: 'pageSize',
+    required: false,
     description: 'Number of cards per page',
-    example: '20'
+    example: '20',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Cards retrieved successfully',
-    type: CardsListResponseDto
+    type: CardsListResponseDto,
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async findAll(
@@ -109,9 +136,12 @@ export class CardsController {
     @Query('tag') tag?: string,
     @Query('search') search?: string,
     @Query('page') page?: string,
-    @Query('pageSize') pageSize?: string,
+    @Query('pageSize') pageSize?: string
   ) {
-    const pg = getPagination(page ? parseInt(page, 10) : 1, pageSize ? parseInt(pageSize, 10) : 50);
+    const pg = getPagination(
+      page ? parseInt(page, 10) : 1,
+      pageSize ? parseInt(pageSize, 10) : 50
+    );
     const result = await this.cardsService.findAll(req.user.id, {
       tag,
       search,
@@ -123,19 +153,19 @@ export class CardsController {
   }
 
   @Get(':id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get a single card',
-    description: 'Retrieves detailed information for a specific card by ID'
+    description: 'Retrieves detailed information for a specific card by ID',
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'Unique identifier of the card',
-    example: 'card-123-uuid-456'
+    example: 'card-123-uuid-456',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Card retrieved successfully',
-    type: CardResponseDto
+    type: CardResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Card not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -144,23 +174,25 @@ export class CardsController {
   }
 
   @Patch(':id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Update a card',
-    description: 'Updates an existing card with new content, tags, or difficulty level'
+    description:
+      'Updates an existing card with new content, tags, or difficulty level',
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'Unique identifier of the card to update',
-    example: 'card-123-uuid-456'
+    example: 'card-123-uuid-456',
   })
-  @ApiBody({ 
+  @ApiBody({
     type: UpdateCardDto,
-    description: 'Card update details including optional front content, back content, explanation, examples, tags, and difficulty level'
+    description:
+      'Card update details including optional front content, back content, explanation, examples, tags, and difficulty level',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Card updated successfully',
-    type: CardResponseDto
+    type: CardResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Card not found' })
   @ApiResponse({ status: 400, description: 'Invalid update data' })
@@ -170,19 +202,19 @@ export class CardsController {
   }
 
   @Delete(':id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Delete a card',
-    description: 'Permanently removes a card from the user\'s collection'
+    description: "Permanently removes a card from the user's collection",
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'Unique identifier of the card to delete',
-    example: 'card-123-uuid-456'
+    example: 'card-123-uuid-456',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Card deleted successfully',
-    type: SuccessResponseDto
+    type: SuccessResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Card not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })

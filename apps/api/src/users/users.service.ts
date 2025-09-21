@@ -72,31 +72,38 @@ export class UsersService {
 
     const totalReviews = studySessions.reduce(
       (sum, session) => sum + session.cardsAttempted,
-      0,
+      0
     );
     const correctReviews = studySessions.reduce(
       (sum, session) => sum + session.cardsCorrect,
-      0,
+      0
     );
 
-    const averageAccuracy = totalReviews > 0 ? correctReviews / totalReviews : 0;
+    const averageAccuracy =
+      totalReviews > 0 ? correctReviews / totalReviews : 0;
 
     // Calculate streak
     const today = new Date();
-    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    
+    const todayStart = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    );
+
     let streakDays = 0;
-    let currentDate = new Date(todayStart);
-    
-    while (streakDays < 365) { // Max 365 days to prevent infinite loop
+    const currentDate = new Date(todayStart);
+
+    while (streakDays < 365) {
+      // Max 365 days to prevent infinite loop
       const dayStart = new Date(currentDate);
       const dayEnd = new Date(currentDate);
       dayEnd.setHours(23, 59, 59, 999);
-      
+
       const hasSessionThisDay = studySessions.some(
-        session => session.startedAt >= dayStart && session.startedAt <= dayEnd
+        (session) =>
+          session.startedAt >= dayStart && session.startedAt <= dayEnd
       );
-      
+
       if (hasSessionThisDay) {
         streakDays++;
         currentDate.setDate(currentDate.getDate() - 1);
@@ -107,7 +114,7 @@ export class UsersService {
 
     // Time studied today
     const timeStudiedToday = studySessions
-      .filter(session => {
+      .filter((session) => {
         const sessionDate = new Date(session.startedAt);
         return sessionDate >= todayStart;
       })

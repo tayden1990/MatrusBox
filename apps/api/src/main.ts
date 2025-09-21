@@ -7,12 +7,14 @@ import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { logger: new LoggerService() });
+  const app = await NestFactory.create(AppModule, {
+    logger: new LoggerService(),
+  });
   // Global exception filter
   app.useGlobalFilters(new AllExceptionsFilter());
-  
+
   const configService = app.get(ConfigService);
-  
+
   // Enable CORS
   app.enableCors({
     origin: [
@@ -30,7 +32,7 @@ async function bootstrap() {
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
-    }),
+    })
   );
 
   // API prefix
@@ -43,13 +45,13 @@ async function bootstrap() {
     .setVersion('1.0')
     .addBearerAuth()
     .build();
-  
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
   const port = configService.get('PORT', 4000);
   await app.listen(port);
-  
+
   const logger = new LoggerService();
   logger.log(`🚀 Matrus API is running on: http://localhost:${port}`);
   logger.log(`📚 API Documentation: http://localhost:${port}/api/docs`);

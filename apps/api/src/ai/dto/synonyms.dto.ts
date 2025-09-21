@@ -2,17 +2,17 @@ import { IsString, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class GenerateSynonymsDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'The word to generate synonyms for',
-    example: 'happy'
+    example: 'happy',
   })
   @IsString()
   word!: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Target language for synonyms',
     example: 'English',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()

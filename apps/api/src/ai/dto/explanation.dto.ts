@@ -2,24 +2,24 @@ import { IsString, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class GenerateExplanationDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'The word to generate an explanation for',
-    example: 'serendipity'
+    example: 'serendipity',
   })
   @IsString()
   word!: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Context in which the word appears',
-    example: 'It was pure serendipity that led to their meeting.'
+    example: 'It was pure serendipity that led to their meeting.',
   })
   @IsString()
   context!: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Target language for the explanation',
     example: 'English',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()

@@ -2,28 +2,28 @@ import { IsString, IsOptional, IsInt, Min, Max } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class GenerateExampleDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Context or word for which to generate an example sentence',
-    example: 'The word "serendipity" in a literary context'
+    example: 'The word "serendipity" in a literary context',
   })
   @IsString()
   context!: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Target language for the example',
     example: 'English',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   language?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Difficulty level from 1 (easy) to 5 (advanced)',
     example: 3,
     minimum: 1,
     maximum: 5,
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsInt()

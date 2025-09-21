@@ -6,7 +6,10 @@ import { UpdateCardDto } from './dto/update-card.dto';
 
 @Injectable()
 export class CardsService {
-  constructor(private prisma: PrismaService, private leitnerService: LeitnerService) {}
+  constructor(
+    private prisma: PrismaService,
+    private leitnerService: LeitnerService
+  ) {}
 
   async create(userId: string, dto: CreateCardDto) {
     const card = await this.prisma.card.create({
@@ -26,7 +29,10 @@ export class CardsService {
     return { success: true, data: card };
   }
 
-  async findAll(userId: string, query: { tag?: string; search?: string; skip?: number; take?: number }) {
+  async findAll(
+    userId: string,
+    query: { tag?: string; search?: string; skip?: number; take?: number }
+  ) {
     const { tag, search, skip = 0, take = 50 } = query;
     const where: any = { userId };
     if (tag) {
@@ -62,7 +68,9 @@ export class CardsService {
   }
 
   async update(userId: string, id: string, dto: UpdateCardDto) {
-    const existing = await this.prisma.card.findFirst({ where: { id, userId } });
+    const existing = await this.prisma.card.findFirst({
+      where: { id, userId },
+    });
     if (!existing) throw new NotFoundException('Card not found');
 
     const card = await this.prisma.card.update({
@@ -81,7 +89,9 @@ export class CardsService {
   }
 
   async remove(userId: string, id: string) {
-    const existing = await this.prisma.card.findFirst({ where: { id, userId } });
+    const existing = await this.prisma.card.findFirst({
+      where: { id, userId },
+    });
     if (!existing) throw new NotFoundException('Card not found');
     await this.prisma.card.delete({ where: { id } });
     return { success: true, data: { id } };

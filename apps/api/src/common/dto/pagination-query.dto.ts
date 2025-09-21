@@ -28,7 +28,11 @@ export function getPagination(page = 1, pageSize = 50) {
   return { skip, take, page: safePage, pageSize: safeSize };
 }
 
-export function buildMeta(total: number, page: number, pageSize: number): PaginationMeta {
+export function buildMeta(
+  total: number,
+  page: number,
+  pageSize: number
+): PaginationMeta {
   return {
     total,
     page,

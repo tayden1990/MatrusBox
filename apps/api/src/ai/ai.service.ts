@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import type { AIGenerationRequest, AIGenerationResponse } from '@matrus/common-types';
+import type {
+  AIGenerationRequest,
+  AIGenerationResponse,
+} from '@matrus/common-types';
 
 @Injectable()
 export class AIService {
@@ -23,14 +26,18 @@ export class AIService {
     const geminiApiKey = this.configService.get<string>('GEMINI_API_KEY');
     if (geminiApiKey && geminiApiKey !== 'demo-gemini-key-for-testing') {
       this.gemini = new GoogleGenerativeAI(geminiApiKey);
-      this.geminiModel = this.gemini.getGenerativeModel({ model: 'gemini-pro' });
+      this.geminiModel = this.gemini.getGenerativeModel({
+        model: 'gemini-pro',
+      });
     }
   }
 
   /**
    * Choose which AI provider to use based on availability and load balancing
    */
-  private async getAvailableProvider(): Promise<'openai' | 'gemini' | 'fallback'> {
+  private async getAvailableProvider(): Promise<
+    'openai' | 'gemini' | 'fallback'
+  > {
     // Check if OpenAI is available
     if (this.openai) {
       try {
@@ -53,7 +60,10 @@ export class AIService {
   /**
    * Generate AI response using the best available provider
    */
-  private async generateWithBestProvider(prompt: string, systemMessage?: string): Promise<string> {
+  private async generateWithBestProvider(
+    prompt: string,
+    systemMessage?: string
+  ): Promise<string> {
     const provider = await this.getAvailableProvider();
 
     switch (provider) {
@@ -66,11 +76,16 @@ export class AIService {
     }
   }
 
-  private async generateWithOpenAI(prompt: string, systemMessage?: string): Promise<string> {
+  private async generateWithOpenAI(
+    prompt: string,
+    systemMessage?: string
+  ): Promise<string> {
     const completion = await this.openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: [
-        ...(systemMessage ? [{ role: 'system' as const, content: systemMessage }] : []),
+        ...(systemMessage
+          ? [{ role: 'system' as const, content: systemMessage }]
+          : []),
         { role: 'user' as const, content: prompt },
       ],
       max_tokens: 300,
@@ -80,14 +95,19 @@ export class AIService {
     return completion.choices[0]?.message?.content?.trim() || '';
   }
 
-  private async generateWithGemini(prompt: string, systemMessage?: string): Promise<string> {
+  private async generateWithGemini(
+    prompt: string,
+    systemMessage?: string
+  ): Promise<string> {
     const fullPrompt = systemMessage ? `${systemMessage}\n\n${prompt}` : prompt;
     const result = await this.geminiModel.generateContent(fullPrompt);
     const response = await result.response;
     return response.text() || '';
   }
 
-  async generateExample(request: AIGenerationRequest): Promise<AIGenerationResponse> {
+  async generateExample(
+    request: AIGenerationRequest
+  ): Promise<AIGenerationResponse> {
     const { context, language = 'English', difficulty = 3 } = request;
     const prompt = this.buildExamplePrompt(context, language, difficulty);
 
@@ -97,7 +117,8 @@ export class AIService {
         messages: [
           {
             role: 'system',
-            content: 'You are a language learning assistant. Create helpful example sentences that demonstrate word usage in context.',
+            content:
+              'You are a language learning assistant. Create helpful example sentences that demonstrate word usage in context.',
           },
           {
             role: 'user',
@@ -121,7 +142,11 @@ export class AIService {
     }
   }
 
-  async generateExplanation(word: string, context: string, language = 'English'): Promise<AIGenerationResponse> {
+  async generateExplanation(
+    word: string,
+    context: string,
+    language = 'English'
+  ): Promise<AIGenerationResponse> {
     const prompt = `Explain the meaning and usage of "${word}" in ${language}. Provide a clear, concise explanation suitable for language learners. Context: ${context}`;
 
     try {
@@ -130,7 +155,8 @@ export class AIService {
         messages: [
           {
             role: 'system',
-            content: 'You are a helpful language teacher. Explain words and concepts clearly and concisely.',
+            content:
+              'You are a helpful language teacher. Explain words and concepts clearly and concisely.',
           },
           {
             role: 'user',
@@ -165,10 +191,12 @@ export class AIService {
 
     if (averageAccuracy > 0.9 && streakDays > 7) {
       adjustmentFactor = 1.3; // Increase intervals
-      recommendation = 'Great job! Increasing review intervals due to strong performance.';
+      recommendation =
+        'Great job! Increasing review intervals due to strong performance.';
     } else if (averageAccuracy < 0.6) {
       adjustmentFactor = 0.7; // Decrease intervals
-      recommendation = 'Focusing on more frequent reviews to help reinforce learning.';
+      recommendation =
+        'Focusing on more frequent reviews to help reinforce learning.';
     } else if (performance > 80) {
       adjustmentFactor = 1.1;
       recommendation = 'Good progress! Slightly extending review intervals.';
@@ -179,7 +207,10 @@ export class AIService {
     return { recommendation, adjustmentFactor };
   }
 
-  async generateSynonyms(word: string, language = 'English'): Promise<AIGenerationResponse> {
+  async generateSynonyms(
+    word: string,
+    language = 'English'
+  ): Promise<AIGenerationResponse> {
     const prompt = `List 3-5 synonyms for "${word}" in ${language}. Provide only the synonyms, separated by commas.`;
 
     try {
@@ -203,7 +234,11 @@ export class AIService {
     }
   }
 
-  private buildExamplePrompt(context: string, language: string, difficulty: number): string {
+  private buildExamplePrompt(
+    context: string,
+    language: string,
+    difficulty: number
+  ): string {
     const difficultyMap = {
       1: 'very simple',
       2: 'simple',
@@ -215,7 +250,11 @@ export class AIService {
     return `Create a ${difficultyMap[difficulty] || 'intermediate'} example sentence in ${language} using "${context}". The sentence should clearly demonstrate the meaning and usage of the word/phrase.`;
   }
 
-  async getRecommendation(userId: string, context?: string, limit = 3): Promise<{ recommendations: string[] }> {
+  async getRecommendation(
+    userId: string,
+    context?: string,
+    limit = 3
+  ): Promise<{ recommendations: string[] }> {
     // TODO: Use userId and context to personalize recommendations
     // For now, use OpenAI to generate generic study recommendations
     const prompt = `Suggest ${limit} personalized study recommendations for a language learner. Context: ${context || 'N/A'}`;
@@ -223,7 +262,11 @@ export class AIService {
       const completion = await this.openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
         messages: [
-          { role: 'system', content: 'You are a language learning coach. Give actionable, personalized study recommendations.' },
+          {
+            role: 'system',
+            content:
+              'You are a language learning coach. Give actionable, personalized study recommendations.',
+          },
           { role: 'user', content: prompt },
         ],
         max_tokens: 150,
@@ -231,20 +274,30 @@ export class AIService {
       });
       const content = completion.choices[0]?.message?.content?.trim() || '';
       // Split recommendations by line or bullet
-      const recommendations = content.split(/\n|\d+\.|\-/).map(r => r.trim()).filter(Boolean);
+      const recommendations = content
+        .split(/\n|\d+\.|\-/)
+        .map((r) => r.trim())
+        .filter(Boolean);
       return { recommendations };
     } catch (error) {
       throw new Error(`Recommendation generation failed: ${error.message}`);
     }
   }
 
-  async explainError(error: string, context?: string): Promise<{ explanation: string }> {
+  async explainError(
+    error: string,
+    context?: string
+  ): Promise<{ explanation: string }> {
     const prompt = `Explain the following error or mistake to a language learner in simple terms: "${error}". Context: ${context || 'N/A'}`;
     try {
       const completion = await this.openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
         messages: [
-          { role: 'system', content: 'You are a patient language tutor. Explain errors and mistakes in a helpful, encouraging way.' },
+          {
+            role: 'system',
+            content:
+              'You are a patient language tutor. Explain errors and mistakes in a helpful, encouraging way.',
+          },
           { role: 'user', content: prompt },
         ],
         max_tokens: 120,
@@ -257,7 +310,11 @@ export class AIService {
     }
   }
 
-  async generateCard(topic: string, difficulty: number = 3, language: string = 'English'): Promise<{
+  async generateCard(
+    topic: string,
+    difficulty: number = 3,
+    language: string = 'English'
+  ): Promise<{
     front: string;
     back: string;
     explanation?: string;
@@ -265,8 +322,10 @@ export class AIService {
     tags?: string[];
     difficulty: number;
   }> {
-    const difficultyText = ['very easy', 'easy', 'medium', 'hard', 'very hard'][difficulty - 1] || 'medium';
-    
+    const difficultyText =
+      ['very easy', 'easy', 'medium', 'hard', 'very hard'][difficulty - 1] ||
+      'medium';
+
     const prompt = `Create a flashcard for learning ${language} on the topic: "${topic}". 
     Difficulty level: ${difficultyText} (${difficulty}/5).
     
@@ -286,20 +345,25 @@ export class AIService {
       "tags": ["tag1", "tag2", "tag3"]
     }`;
 
-    const systemMessage = 'You are an expert educator creating high-quality flashcards. Always respond with valid JSON only.';
+    const systemMessage =
+      'You are an expert educator creating high-quality flashcards. Always respond with valid JSON only.';
 
     try {
-      const content = await this.generateWithBestProvider(prompt, systemMessage);
-      
+      const content = await this.generateWithBestProvider(
+        prompt,
+        systemMessage
+      );
+
       try {
         const cardData = JSON.parse(content);
         return {
           front: cardData.front || `What is important about ${topic}?`,
-          back: cardData.back || `${topic} is an important concept to understand.`,
+          back:
+            cardData.back || `${topic} is an important concept to understand.`,
           explanation: cardData.explanation,
           exampleSentences: cardData.exampleSentences || [],
           tags: cardData.tags || [topic.toLowerCase()],
-          difficulty
+          difficulty,
         };
       } catch (parseError) {
         // Fallback if JSON parsing fails
@@ -314,37 +378,49 @@ export class AIService {
 
   private getFallbackCard(topic: string, difficulty: number) {
     const fallbackCards = {
-      'vocabulary': {
+      vocabulary: {
         front: 'What does "serendipity" mean?',
         back: 'A pleasant surprise; finding something good without looking for it',
-        explanation: 'From a Persian fairy tale about princes making discoveries by accident',
-        exampleSentences: ['It was pure serendipity that led to their meeting.', 'The discovery was a result of serendipity.'],
-        tags: ['vocabulary', 'english', 'advanced']
+        explanation:
+          'From a Persian fairy tale about princes making discoveries by accident',
+        exampleSentences: [
+          'It was pure serendipity that led to their meeting.',
+          'The discovery was a result of serendipity.',
+        ],
+        tags: ['vocabulary', 'english', 'advanced'],
       },
-      'math': {
+      math: {
         front: 'What is the Pythagorean theorem?',
         back: 'a² + b² = c² (In a right triangle, the square of the hypotenuse equals the sum of squares of the other two sides)',
         explanation: 'Named after the ancient Greek mathematician Pythagoras',
-        exampleSentences: ['Use the Pythagorean theorem to find the missing side.', 'This right triangle follows the Pythagorean theorem.'],
-        tags: ['math', 'geometry', 'theorem']
+        exampleSentences: [
+          'Use the Pythagorean theorem to find the missing side.',
+          'This right triangle follows the Pythagorean theorem.',
+        ],
+        tags: ['math', 'geometry', 'theorem'],
       },
-      'science': {
+      science: {
         front: 'What is photosynthesis?',
         back: 'The process by which plants convert sunlight, water, and carbon dioxide into glucose and oxygen',
-        explanation: 'Essential for plant survival and oxygen production on Earth',
-        exampleSentences: ['Photosynthesis occurs in the chloroplasts of plant cells.', 'Without photosynthesis, life on Earth would not exist.'],
-        tags: ['science', 'biology', 'plants']
-      }
+        explanation:
+          'Essential for plant survival and oxygen production on Earth',
+        exampleSentences: [
+          'Photosynthesis occurs in the chloroplasts of plant cells.',
+          'Without photosynthesis, life on Earth would not exist.',
+        ],
+        tags: ['science', 'biology', 'plants'],
+      },
     };
 
-    const cardKey = Object.keys(fallbackCards).find(key => 
-      topic.toLowerCase().includes(key)
-    ) || 'vocabulary';
+    const cardKey =
+      Object.keys(fallbackCards).find((key) =>
+        topic.toLowerCase().includes(key)
+      ) || 'vocabulary';
 
     const card = fallbackCards[cardKey];
     return {
       ...card,
-      difficulty
+      difficulty,
     };
   }
 }

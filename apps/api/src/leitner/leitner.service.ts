@@ -47,8 +47,20 @@ export class LeitnerService {
     return { success: true, data: cards };
   }
 
-  private computeAdaptiveInterval(lc: any, correct: boolean, selfRating?: number): SchedulingResult {
-    let { boxLevel, easeFactor, interval, repetitions, totalReviews, correctReviews, consecutiveCorrect } = lc;
+  private computeAdaptiveInterval(
+    lc: any,
+    correct: boolean,
+    selfRating?: number
+  ): SchedulingResult {
+    let {
+      boxLevel,
+      easeFactor,
+      interval,
+      repetitions,
+      totalReviews,
+      correctReviews,
+      consecutiveCorrect,
+    } = lc;
     totalReviews += 1;
 
     if (correct) {
@@ -58,7 +70,8 @@ export class LeitnerService {
       boxLevel = Math.min(this.maxBox, boxLevel + 1);
       // Adjust ease factor using SM-2 style formula with selfRating fallback
       const quality = selfRating != null ? selfRating : 4; // assume good if correct
-      easeFactor = easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+      easeFactor =
+        easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
       if (easeFactor < 1.3) easeFactor = 1.3;
       if (repetitions === 1) interval = 1;
       else if (repetitions === 2) interval = 3;
@@ -77,12 +90,27 @@ export class LeitnerService {
     const nextReviewAt = new Date();
     nextReviewAt.setDate(nextReviewAt.getDate() + interval);
 
-    return { boxLevel, easeFactor, interval, nextReviewAt, repetitions, totalReviews, correctReviews, consecutiveCorrect };
+    return {
+      boxLevel,
+      easeFactor,
+      interval,
+      nextReviewAt,
+      repetitions,
+      totalReviews,
+      correctReviews,
+      consecutiveCorrect,
+    };
   }
 
-  async reviewCard(cardId: string, userId: string, correct: boolean, selfRating?: number) {
+  async reviewCard(
+    cardId: string,
+    userId: string,
+    correct: boolean,
+    selfRating?: number
+  ) {
     const lc = await this.prisma.leitnerCard.findUnique({ where: { cardId } });
-    if (!lc || lc.userId !== userId) throw new NotFoundException('Leitner card not found');
+    if (!lc || lc.userId !== userId)
+      throw new NotFoundException('Leitner card not found');
 
     const result = this.computeAdaptiveInterval(lc, correct, selfRating);
 

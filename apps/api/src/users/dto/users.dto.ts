@@ -1,182 +1,182 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UserResponseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'user-123-uuid-456',
-    description: 'Unique user identifier'
+    description: 'Unique user identifier',
   })
   id: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'user@example.com',
-    description: 'User email address'
+    description: 'User email address',
   })
   email: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'John',
     description: 'User first name',
-    required: false
+    required: false,
   })
   firstName?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'Doe',
     description: 'User last name',
-    required: false
+    required: false,
   })
   lastName?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 123456789,
     description: 'Telegram user ID if connected',
-    required: false
+    required: false,
   })
   telegramId?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: '2024-01-01T00:00:00Z',
-    description: 'Account creation timestamp'
+    description: 'Account creation timestamp',
   })
   createdAt: Date;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: '2024-01-01T00:00:00Z',
-    description: 'Last profile update timestamp'
+    description: 'Last profile update timestamp',
   })
   updatedAt: Date;
 }
 
 export class UserStatsResponseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     example: 150,
-    description: 'Total number of cards created by user'
+    description: 'Total number of cards created by user',
   })
   totalCards: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 85,
-    description: 'Number of cards learned (mastered)'
+    description: 'Number of cards learned (mastered)',
   })
   learnedCards: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 42,
-    description: 'Current study streak in days'
+    description: 'Current study streak in days',
   })
   currentStreak: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 89,
-    description: 'Longest study streak in days'
+    description: 'Longest study streak in days',
   })
   longestStreak: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 87.5,
-    description: 'Overall accuracy percentage'
+    description: 'Overall accuracy percentage',
   })
   accuracy: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 25,
-    description: 'Total number of study sessions completed'
+    description: 'Total number of study sessions completed',
   })
   totalSessions: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 320,
-    description: 'Total study time in minutes'
+    description: 'Total study time in minutes',
   })
   totalStudyTime: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 12.8,
-    description: 'Average study time per session in minutes'
+    description: 'Average study time per session in minutes',
   })
   averageSessionTime: number;
 }
 
 export class UserSettingsResponseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     example: true,
-    description: 'Enable/disable notifications'
+    description: 'Enable/disable notifications',
   })
   notifications: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'en',
-    description: 'User interface language preference'
+    description: 'User interface language preference',
   })
   language: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'UTC',
-    description: 'User timezone setting'
+    description: 'User timezone setting',
   })
   timezone: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: true,
-    description: 'Enable/disable study reminders'
+    description: 'Enable/disable study reminders',
   })
   studyReminders: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 20,
-    description: 'Daily study goal in cards'
+    description: 'Daily study goal in cards',
   })
   dailyGoal: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'spaced',
     description: 'Study mode preference',
-    enum: ['spaced', 'intensive', 'review']
+    enum: ['spaced', 'intensive', 'review'],
   })
   studyMode: string;
 }
 
 export class UserSettingsUpdateDto {
-  @ApiProperty({ 
+  @ApiProperty({
     example: true,
     description: 'Enable/disable notifications',
-    required: false
+    required: false,
   })
   notifications?: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'en',
     description: 'User interface language preference',
-    required: false
+    required: false,
   })
   language?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'UTC',
     description: 'User timezone setting',
-    required: false
+    required: false,
   })
   timezone?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: true,
     description: 'Enable/disable study reminders',
-    required: false
+    required: false,
   })
   studyReminders?: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 20,
     description: 'Daily study goal in cards',
-    required: false
+    required: false,
   })
   dailyGoal?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'spaced',
     description: 'Study mode preference',
     enum: ['spaced', 'intensive', 'review'],
-    required: false
+    required: false,
   })
   studyMode?: string;
 }

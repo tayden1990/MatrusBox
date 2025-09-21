@@ -1,10 +1,10 @@
-import Redis from 'ioredis';
+import Redis from "ioredis";
 
 export class RedisService {
   private redis: Redis;
 
   constructor() {
-    const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+    const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
     this.redis = new Redis(redisUrl);
   }
 

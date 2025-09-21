@@ -1,154 +1,169 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class PronunciationResponseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Pronunciation accuracy score (0-100)',
     example: 85,
     minimum: 0,
     maximum: 100,
-    required: false
+    required: false,
   })
   score?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Detailed feedback on pronunciation',
-    example: 'Good pronunciation overall. Pay attention to the "th" sound in "serendipity".'
+    example:
+      'Good pronunciation overall. Pay attention to the "th" sound in "serendipity".',
   })
   feedback: string;
 }
 
 export class ExampleResponseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Generated example sentence',
-    example: 'It was pure serendipity that led to their meeting at the coffee shop.'
+    example:
+      'It was pure serendipity that led to their meeting at the coffee shop.',
   })
   example: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Context or difficulty level used',
-    example: 'intermediate'
+    example: 'intermediate',
   })
   context: string;
 }
 
 export class ExplanationResponseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Detailed explanation of the word or concept',
-    example: 'Serendipity refers to the occurrence of events by chance in a happy or beneficial way. It comes from a Persian fairy tale about three princes who made discoveries by accident.'
+    example:
+      'Serendipity refers to the occurrence of events by chance in a happy or beneficial way. It comes from a Persian fairy tale about three princes who made discoveries by accident.',
   })
   explanation: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Etymology or word origin information',
-    example: 'From the Persian fairy tale "The Three Princes of Serendip" by Horace Walpole (1754)'
+    example:
+      'From the Persian fairy tale "The Three Princes of Serendip" by Horace Walpole (1754)',
   })
   etymology?: string;
 }
 
 export class SynonymsResponseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'List of synonyms for the word',
     example: ['coincidence', 'luck', 'fortune', 'chance', 'accident'],
-    type: [String]
+    type: [String],
   })
   synonyms: string[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'The original word',
-    example: 'serendipity'
+    example: 'serendipity',
   })
   word: string;
 }
 
 export class SchedulingRecommendationDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Recommended adjustment to review intervals',
-    example: 'Increase interval by 20% due to high accuracy'
+    example: 'Increase interval by 20% due to high accuracy',
   })
   recommendation: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Suggested next review time in hours',
-    example: 48
+    example: 48,
   })
   nextReviewHours: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Confidence level of the recommendation (0-100)',
     example: 92,
     minimum: 0,
-    maximum: 100
+    maximum: 100,
   })
   confidence: number;
 }
 
 export class StudyRecommendationDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Type of recommendation',
     example: 'Focus on vocabulary cards with low accuracy',
-    enum: ['focus_weak_areas', 'review_due_cards', 'practice_new_material', 'take_break']
+    enum: [
+      'focus_weak_areas',
+      'review_due_cards',
+      'practice_new_material',
+      'take_break',
+    ],
   })
   type: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Detailed recommendation message',
-    example: 'Based on your recent performance, focus on vocabulary cards where your accuracy is below 70%. Consider reviewing the explanation and examples for these cards.'
+    example:
+      'Based on your recent performance, focus on vocabulary cards where your accuracy is below 70%. Consider reviewing the explanation and examples for these cards.',
   })
   message: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Suggested study time in minutes',
-    example: 25
+    example: 25,
   })
   suggestedTime: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Priority level of this recommendation',
     example: 'high',
-    enum: ['low', 'medium', 'high']
+    enum: ['low', 'medium', 'high'],
   })
   priority: string;
 }
 
 export class RecommendationsListDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'List of personalized study recommendations',
-    type: [StudyRecommendationDto]
+    type: [StudyRecommendationDto],
   })
   recommendations: StudyRecommendationDto[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Overall study health score (0-100)',
     example: 78,
     minimum: 0,
-    maximum: 100
+    maximum: 100,
   })
   studyHealthScore: number;
 }
 
 export class ErrorExplanationResponseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Detailed explanation of why the error occurred',
-    example: 'You confused "their" with "there". "Their" is a possessive pronoun showing ownership, while "there" indicates a place or location.'
+    example:
+      'You confused "their" with "there". "Their" is a possessive pronoun showing ownership, while "there" indicates a place or location.',
   })
   explanation: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Correct form or answer',
-    example: 'their'
+    example: 'their',
   })
   correction: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Tips to avoid similar errors',
-    example: 'Remember: "their" shows possession (their car), "there" shows location (over there), "they\'re" is a contraction (they are).'
+    example:
+      'Remember: "their" shows possession (their car), "there" shows location (over there), "they\'re" is a contraction (they are).',
   })
   tips: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Additional examples demonstrating correct usage',
-    example: ['They parked their car over there.', 'Their house is there, on the corner.'],
-    type: [String]
+    example: [
+      'They parked their car over there.',
+      'Their house is there, on the corner.',
+    ],
+    type: [String],
   })
   examples: string[];
 }

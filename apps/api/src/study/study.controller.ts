@@ -1,5 +1,20 @@
-import { Controller, Post, Get, Param, Body, UseGuards, Req } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiParam, ApiBody, ApiResponse } from '@nestjs/swagger';
+import {
+  Controller,
+  Post,
+  Get,
+  Param,
+  Body,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiBody,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Public } from '../auth/decorators/public.decorator';
 import { StudyService } from './study.service';
@@ -14,15 +29,20 @@ export class StudyController {
   constructor(private studyService: StudyService) {}
 
   @Post('session')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Start a new study session',
-    description: 'Initiates a new spaced repetition study session with selected cards'
+    description:
+      'Initiates a new spaced repetition study session with selected cards',
   })
-  @ApiBody({ 
+  @ApiBody({
     type: StartSessionDto,
-    description: 'Study session configuration including card selection criteria, session type, and optional time limits'
+    description:
+      'Study session configuration including card selection criteria, session type, and optional time limits',
   })
-  @ApiResponse({ status: 201, description: 'Study session started successfully' })
+  @ApiResponse({
+    status: 201,
+    description: 'Study session started successfully',
+  })
   @ApiResponse({ status: 400, description: 'Invalid session parameters' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   start(@Req() req: any, @Body() dto: StartSessionDto) {
@@ -30,85 +50,96 @@ export class StudyController {
   }
 
   @Get('session/:id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get session details (with answers)',
-    description: 'Retrieves comprehensive details of a study session including progress and submitted answers'
+    description:
+      'Retrieves comprehensive details of a study session including progress and submitted answers',
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'Study session ID',
-    example: 'session-123-uuid-456'
+    example: 'session-123-uuid-456',
   })
-  @ApiResponse({ status: 200, description: 'Session details retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Session details retrieved successfully',
+  })
   @ApiResponse({ status: 404, description: 'Session not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  getSession(@Req() req: any, @Param('id') id: string) {
-    return this.studyService.getSession(req.user.id, id);
+  getSession(@Req() req: any, @Param('id') _id: string) {
+    return this.studyService.getSession(req.user.id, _id);
   }
 
   @Post('session/:id/end')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'End a session',
-    description: 'Completes a study session and calculates final statistics and performance metrics'
+    description:
+      'Completes a study session and calculates final statistics and performance metrics',
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'Study session ID to end',
-    example: 'session-123-uuid-456'
+    example: 'session-123-uuid-456',
   })
   @ApiResponse({ status: 200, description: 'Session ended successfully' })
   @ApiResponse({ status: 404, description: 'Session not found' })
   @ApiResponse({ status: 400, description: 'Session already ended' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  end(@Req() req: any, @Param('id') id: string) {
-    return this.studyService.endSession(req.user.id, id);
+  end(@Req() req: any, @Param('id') _id: string) {
+    return this.studyService.endSession(req.user.id, _id);
   }
 
   @Get('session/:id/next')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get next card for this session',
-    description: 'Retrieves the next card to be studied using spaced repetition algorithm'
+    description:
+      'Retrieves the next card to be studied using spaced repetition algorithm',
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'Study session ID',
-    example: 'session-123-uuid-456'
+    example: 'session-123-uuid-456',
   })
   @ApiResponse({ status: 200, description: 'Next card retrieved successfully' })
-  @ApiResponse({ status: 404, description: 'Session not found or no more cards' })
+  @ApiResponse({
+    status: 404,
+    description: 'Session not found or no more cards',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  next(@Req() req: any, @Param('id') id: string) {
-    return this.studyService.getNextCard(req.user.id, id);
+  next(@Req() req: any, @Param('id') _id: string) {
+    return this.studyService.getNextCard(req.user.id, _id);
   }
 
   @Post('session/:id/answer')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Submit an answer for a card in the session',
-    description: 'Records user response and updates spaced repetition scheduling based on answer quality'
+    description:
+      'Records user response and updates spaced repetition scheduling based on answer quality',
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'Study session ID',
-    example: 'session-123-uuid-456'
+    example: 'session-123-uuid-456',
   })
-  @ApiBody({ 
+  @ApiBody({
     type: AnswerDto,
-    description: 'User answer details including card ID, response content, correctness, and optional performance metrics'
+    description:
+      'User answer details including card ID, response content, correctness, and optional performance metrics',
   })
   @ApiResponse({ status: 201, description: 'Answer submitted successfully' })
   @ApiResponse({ status: 404, description: 'Session not found' })
   @ApiResponse({ status: 400, description: 'Invalid answer data' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  answer(@Req() req: any, @Param('id') id: string, @Body() dto: AnswerDto) {
-    return this.studyService.answer(req.user.id, id, dto);
+  answer(@Req() req: any, @Param('id') _id: string, @Body() dto: AnswerDto) {
+    return this.studyService.answer(req.user.id, _id, dto);
   }
 
   // Demo endpoints for testing without authentication
   @Public()
   @Post('session/demo')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Start a demo study session (no auth required)',
-    description: 'Starts a demo study session for testing purposes'
+    description: 'Starts a demo study session for testing purposes',
   })
   startDemo(@Body() dto: StartSessionDto) {
     // Mock session data
@@ -120,22 +151,22 @@ export class StudyController {
       startedAt: new Date(),
       cardsRemaining: 8,
       totalCards: 10,
-      status: 'active'
+      status: 'active',
     };
-    
+
     return {
       success: true,
-      data: mockSession
+      data: mockSession,
     };
   }
 
   @Public()
   @Get('session/:id/next/demo')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get next demo card (no auth required)',
-    description: 'Gets the next card in a demo study session'
+    description: 'Gets the next card in a demo study session',
   })
-  nextDemo(@Param('id') id: string) {
+  nextDemo(@Param('id') _id: string) {
     // Mock card data
     const mockCards = [
       {
@@ -143,7 +174,10 @@ export class StudyController {
         front: 'What is the capital of France?',
         back: 'Paris',
         explanation: 'Paris is the capital and most populous city of France.',
-        exampleSentences: ['Paris is known for the Eiffel Tower.', 'The Louvre Museum is located in Paris.'],
+        exampleSentences: [
+          'Paris is known for the Eiffel Tower.',
+          'The Louvre Museum is located in Paris.',
+        ],
         tags: ['geography', 'capitals'],
         leitnerCard: {
           id: 'leitner-1',
@@ -152,8 +186,8 @@ export class StudyController {
           nextReview: new Date(Date.now() + 24 * 60 * 60 * 1000),
           repetitions: 1,
           easiness: 2.5,
-          interval: 1
-        }
+          interval: 1,
+        },
       },
       {
         id: `card-${Date.now() + 1}`,
@@ -169,35 +203,37 @@ export class StudyController {
           nextReview: new Date(Date.now() + 12 * 60 * 60 * 1000),
           repetitions: 0,
           easiness: 2.5,
-          interval: 1
-        }
-      }
+          interval: 1,
+        },
+      },
     ];
 
     const randomCard = mockCards[Math.floor(Math.random() * mockCards.length)];
-    
+
     return {
       success: true,
-      data: randomCard
+      data: randomCard,
     };
   }
 
   @Public()
   @Post('session/:id/answer/demo')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Submit demo answer (no auth required)',
-    description: 'Submits an answer in a demo study session'
+    description: 'Submits an answer in a demo study session',
   })
-  answerDemo(@Param('id') id: string, @Body() dto: AnswerDto) {
+  answerDemo(@Param('id') _id: string, @Body() _dto: AnswerDto) {
     // Mock response
     return {
       success: true,
       data: {
         correct: Math.random() > 0.3, // 70% correct rate
         newBoxLevel: Math.floor(Math.random() * 5) + 1,
-        nextReview: new Date(Date.now() + Math.random() * 7 * 24 * 60 * 60 * 1000),
-        pointsEarned: Math.floor(Math.random() * 10) + 5
-      }
+        nextReview: new Date(
+          Date.now() + Math.random() * 7 * 24 * 60 * 60 * 1000
+        ),
+        pointsEarned: Math.floor(Math.random() * 10) + 5,
+      },
     };
   }
 }

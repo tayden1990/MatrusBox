@@ -2,26 +2,26 @@ import { IsString, IsOptional, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class RecommendationDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'User ID to generate recommendations for',
-    example: 'user-123-uuid-456'
+    example: 'user-123-uuid-456',
   })
   @IsString()
   userId: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Context for personalized recommendations',
     example: 'vocabulary building for business English',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   context?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Maximum number of recommendations to return',
     example: 10,
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsNumber()

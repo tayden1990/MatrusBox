@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { LeitnerService } from '../leitner/leitner.service';
 import { StartSessionDto } from './dto/start-session.dto';
@@ -6,7 +10,10 @@ import { AnswerDto } from './dto/answer.dto';
 
 @Injectable()
 export class StudyService {
-  constructor(private prisma: PrismaService, private leitner: LeitnerService) {}
+  constructor(
+    private prisma: PrismaService,
+    private leitner: LeitnerService
+  ) {}
 
   async startSession(userId: string, dto: StartSessionDto) {
     const session = await this.prisma.studySession.create({
@@ -30,7 +37,9 @@ export class StudyService {
   }
 
   async endSession(userId: string, sessionId: string) {
-    const existing = await this.prisma.studySession.findFirst({ where: { id: sessionId, userId } });
+    const existing = await this.prisma.studySession.findFirst({
+      where: { id: sessionId, userId },
+    });
     if (!existing) throw new NotFoundException('Session not found');
     if (existing.endedAt) return { success: true, data: existing }; // already ended
     const updated = await this.prisma.studySession.update({
@@ -41,7 +50,9 @@ export class StudyService {
   }
 
   async getNextCard(userId: string, sessionId: string) {
-    const session = await this.prisma.studySession.findFirst({ where: { id: sessionId, userId } });
+    const session = await this.prisma.studySession.findFirst({
+      where: { id: sessionId, userId },
+    });
     if (!session) throw new NotFoundException('Session not found');
     if (session.endedAt) throw new BadRequestException('Session already ended');
 
@@ -49,7 +60,7 @@ export class StudyService {
       where: { sessionId },
       select: { cardId: true },
     });
-    const answeredIds = answered.map(a => a.cardId);
+    const answeredIds = answered.map((a) => a.cardId);
 
     // 1. Try due Leitner cards not yet answered
     const now = new Date();
@@ -75,18 +86,23 @@ export class StudyService {
         orderBy: { createdAt: 'asc' },
         include: { card: true },
       });
-      if (fresh) return { success: true, data: { card: fresh.card, source: 'new' } };
+      if (fresh)
+        return { success: true, data: { card: fresh.card, source: 'new' } };
     }
 
     return { success: true, data: { card: null, done: true } };
   }
 
   async answer(userId: string, sessionId: string, dto: AnswerDto) {
-    const session = await this.prisma.studySession.findFirst({ where: { id: sessionId, userId } });
+    const session = await this.prisma.studySession.findFirst({
+      where: { id: sessionId, userId },
+    });
     if (!session) throw new NotFoundException('Session not found');
     if (session.endedAt) throw new BadRequestException('Session already ended');
 
-    const card = await this.prisma.card.findFirst({ where: { id: dto.cardId, userId } });
+    const card = await this.prisma.card.findFirst({
+      where: { id: dto.cardId, userId },
+    });
     if (!card) throw new NotFoundException('Card not found');
 
     // Ensure Leitner card exists (safety)
@@ -98,7 +114,7 @@ export class StudyService {
     const timeSpent = dto.timeSpent ?? 0;
 
     // Record answer & update session stats in a transaction
-    const result = await this.prisma.$transaction(async tx => {
+    const result = await this.prisma.$transaction(async (tx) => {
       const answer = await tx.studyAnswer.create({
         data: {
           sessionId,

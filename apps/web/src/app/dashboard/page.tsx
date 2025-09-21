@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface StudyStats {
@@ -40,12 +40,7 @@ export default function Dashboard() {
   const [showStatsModal, setShowStatsModal] = useState(false);
   const [isStudyMode, setIsStudyMode] = useState(false);
 
-  // Fetch real dashboard data on component mount
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       setLoading(true);
       const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
@@ -95,7 +90,12 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  // Fetch real dashboard data on component mount
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
   const formatTimeAgo = (date: Date): string => {
     const now = new Date();
@@ -319,7 +319,7 @@ export default function Dashboard() {
             Welcome back, Alex! 👋
           </h2>
           <p style={{margin: '0 0 20px 0', fontSize: '16px', opacity: 0.9}}>
-            Ready to continue your learning journey? You're on a {stats.currentStreak}-day streak!
+            Ready to continue your learning journey? You&apos;re on a {stats.currentStreak}-day streak!
           </p>
           <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

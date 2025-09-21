@@ -7,12 +7,15 @@ export class AdminService {
     return [];
   }
 
-  async getUser(id: string): Promise<any> {
+  async getUser(_id: string): Promise<any> {
     // TODO: Replace with actual user fetching logic
     return null;
   }
 
-  async banUser(id: string, reason?: string): Promise<{ success: boolean; id: string; reason?: string }> {
+  async banUser(
+    id: string,
+    reason?: string
+  ): Promise<{ success: boolean; id: string; reason?: string }> {
     // TODO: Replace with actual ban logic
     return { success: true, id, reason };
   }
@@ -22,7 +25,11 @@ export class AdminService {
     return { success: true, id };
   }
 
-  async getSystemStats(): Promise<{ users: number; cards: number; sessions: number }> {
+  async getSystemStats(): Promise<{
+    users: number;
+    cards: number;
+    sessions: number;
+  }> {
     // TODO: Replace with actual stats logic
     return { users: 0, cards: 0, sessions: 0 };
   }

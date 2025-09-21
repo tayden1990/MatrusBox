@@ -69,7 +69,7 @@ import { LoggerService } from './common/utils/logger.service';
     AIModule,
     TelegramModule,
     AnalyticsModule,
-  AdminModule,
+    AdminModule,
     WebsocketModule,
   ],
   providers: [NotificationService, LoggerService],

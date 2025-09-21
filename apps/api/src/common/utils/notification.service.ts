@@ -16,8 +16,12 @@ export class NotificationService {
     userId: string,
     message: string,
     channel: NotificationChannel,
-    options?: NotificationOptions
-  ): Promise<{ success: boolean; channel: NotificationChannel; error?: string }> {
+    _options?: NotificationOptions
+  ): Promise<{
+    success: boolean;
+    channel: NotificationChannel;
+    error?: string;
+  }> {
     try {
       if (channel === 'email') {
         // TODO: Integrate with email provider (e.g., nodemailer, SendGrid)
@@ -37,7 +41,9 @@ export class NotificationService {
       this.logger.warn(`Unknown notification channel: ${channel}`);
       return { success: false, channel, error: 'Unknown channel' };
     } catch (error) {
-      this.logger.error(`Notification error for user ${userId}: ${error.message}`);
+      this.logger.error(
+        `Notification error for user ${userId}: ${error.message}`
+      );
       return { success: false, channel, error: error.message };
     }
   }
