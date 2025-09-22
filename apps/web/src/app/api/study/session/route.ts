@@ -6,6 +6,10 @@ export async function POST(request: NextRequest) {
   try {
     const authHeader = request.headers.get('authorization');
     const body = await request.json();
+    try {
+      const masked = authHeader ? `${authHeader.split(' ')[0]} ${authHeader.slice(0,4)}…${authHeader.slice(-4)}` : 'none';
+      console.log('[API] /study/session POST incoming', { hasAuth: !!authHeader, authMasked: masked });
+    } catch {}
     
     const apiUrl = `${API_BASE_URL}/api/study/session/demo`;
     
@@ -17,6 +21,7 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify(body)
     });
+    try { console.log('[API] backend status', { status: response.status, ok: response.ok }); } catch {}
 
     const data = await response.json();
     

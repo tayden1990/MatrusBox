@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Debug } from '@/lib/debug';
 
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:4000';
 
@@ -7,6 +8,15 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const userId = searchParams.get('userId') || 'demo-user';
     const authHeader = request.headers.get('authorization');
+    // Server-side log (masked)
+    try {
+      const masked = authHeader ? `${authHeader.split(' ')[0]} ${authHeader.slice(0,4)}…${authHeader.slice(-4)}` : 'none';
+      console.log('[API] /analytics/dashboard-stats incoming', {
+        userId,
+        hasAuth: !!authHeader,
+        authMasked: masked,
+      });
+    } catch {}
     
     const response = await fetch(`${API_BASE_URL}/api/analytics/dashboard-stats?userId=${userId}`, {
       method: 'GET',
@@ -15,6 +25,7 @@ export async function GET(request: NextRequest) {
         ...(authHeader && { 'Authorization': authHeader })
       },
     });
+    try { console.log('[API] backend status', { status: response.status, ok: response.ok }); } catch {}
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

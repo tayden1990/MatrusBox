@@ -7,6 +7,10 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const userId = searchParams.get('userId') || 'demo-user';
     const authHeader = request.headers.get('authorization');
+    try {
+      const masked = authHeader ? `${authHeader.split(' ')[0]} ${authHeader.slice(0,4)}…${authHeader.slice(-4)}` : 'none';
+      console.log('[API] /analytics/recent-activity incoming', { userId, hasAuth: !!authHeader, authMasked: masked });
+    } catch {}
 
     const response = await fetch(`${API_BASE_URL}/api/analytics/recent-activity?userId=${userId}`, {
       method: 'GET',
@@ -15,6 +19,7 @@ export async function GET(request: NextRequest) {
         ...(authHeader && { Authorization: authHeader })
       },
     });
+    try { console.log('[API] backend status', { status: response.status, ok: response.ok }); } catch {}
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

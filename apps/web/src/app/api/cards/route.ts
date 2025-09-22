@@ -11,6 +11,10 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     
     const authHeader = request.headers.get('authorization');
+    try {
+      const masked = authHeader ? `${authHeader.split(' ')[0]} ${authHeader.slice(0,4)}…${authHeader.slice(-4)}` : 'none';
+      console.log('[API] /cards GET incoming', { hasAuth: !!authHeader, authMasked: masked, page, limit, tag, search });
+    } catch {}
     
     let apiUrl = `${API_BASE_URL}/api/cards?page=${page}&limit=${limit}`;
     if (tag) apiUrl += `&tag=${encodeURIComponent(tag)}`;
@@ -23,6 +27,7 @@ export async function GET(request: NextRequest) {
         ...(authHeader && { 'Authorization': authHeader })
       }
     });
+    try { console.log('[API] backend status', { status: response.status, ok: response.ok }); } catch {}
 
     const data = await response.json();
     
@@ -46,6 +51,10 @@ export async function POST(request: NextRequest) {
   try {
     const authHeader = request.headers.get('authorization');
     const body = await request.json();
+    try {
+      const masked = authHeader ? `${authHeader.split(' ')[0]} ${authHeader.slice(0,4)}…${authHeader.slice(-4)}` : 'none';
+      console.log('[API] /cards POST incoming', { hasAuth: !!authHeader, authMasked: masked });
+    } catch {}
     
     const apiUrl = `${API_BASE_URL}/api/cards`;
     
@@ -57,6 +66,7 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify(body)
     });
+    try { console.log('[API] backend status', { status: response.status, ok: response.ok }); } catch {}
 
     const data = await response.json();
     

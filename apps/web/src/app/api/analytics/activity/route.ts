@@ -8,6 +8,10 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get('userId');
     
     const authHeader = request.headers.get('authorization');
+    try {
+      const masked = authHeader ? `${authHeader.split(' ')[0]} ${authHeader.slice(0,4)}…${authHeader.slice(-4)}` : 'none';
+      console.log('[API] /analytics/activity incoming', { userId, hasAuth: !!authHeader, authMasked: masked });
+    } catch {}
     
     const apiUrl = `${API_BASE_URL}/api/analytics/activity?userId=${userId}`;
     
@@ -18,6 +22,7 @@ export async function GET(request: NextRequest) {
         ...(authHeader && { 'Authorization': authHeader })
       }
     });
+    try { console.log('[API] backend status', { status: response.status, ok: response.ok }); } catch {}
 
     const data = await response.json();
     
