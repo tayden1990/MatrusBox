@@ -58,6 +58,52 @@ matrus-monorepo/
 - `pnpm docker:up` - Start Docker services
 - `pnpm docker:down` - Stop Docker services
 
+## 🧭 Web app (Next.js) quickstart
+
+To work on just the web UI without starting the whole monorepo:
+
+```powershell
+pnpm --filter @matrus/web dev
+```
+
+Build the web app only:
+
+```powershell
+pnpm --filter @matrus/web build
+```
+
+Run lint and type-check for the web app only:
+
+```powershell
+pnpm --filter @matrus/web lint
+pnpm --filter @matrus/web type-check
+```
+
+When the API is already running (Docker or another terminal) the web UI will use `http://localhost:4000` via Next.js API routes that proxy requests and forward Authorization headers.
+
+## 🛠️ Troubleshooting
+
+- Port already in use (EADDRINUSE) on 4000
+    - Cause: Another API instance is already running (Docker Compose, a previous terminal, or an orphaned process).
+    - Fix options:
+        - Stop Docker API: `pnpm docker:down`
+        - Or stop the local API process that’s listening on 4000
+        - Or run only the web app (no API) using: `pnpm --filter @matrus/web dev`
+        - On Windows, check which process uses the port:
+            ```powershell
+            netstat -ano | findstr :4000
+            taskkill /PID <pid> /F
+            ```
+
+- 401 Unauthorized from proxy routes
+    - Ensure your browser has tokens stored after login (localStorage/sessionStorage).
+    - The Next.js API routes forward Authorization headers; verify requests show the header in the client debug console.
+    - Use the debug toggle (?debug=1) to open the floating console and confirm the Auth snapshot.
+
+- Study flow returns no cards
+    - The demo endpoints may return an empty queue. Try starting a new session from the Study page and check debug logs.
+    - The "End Session" button returns mocked stats in demo mode.
+
 ## 🌟 Features
 
 - **Multi-platform**: Web, mobile (iOS/Android), desktop, and Telegram

@@ -584,26 +584,28 @@ export default function CreateCardPage() {
                 fontSize: '1rem',
                 fontWeight: '500'
               }}
+              aria-label="Cancel and go back to dashboard"
             >
               Cancel
             </button>
             
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || aiLoading}
               style={{
-                background: loading 
+                background: (loading || aiLoading)
                   ? '#ccc' 
                   : 'linear-gradient(135deg, #667eea, #764ba2)',
                 color: 'white',
                 border: 'none',
                 padding: '1rem 2rem',
                 borderRadius: '8px',
-                cursor: loading ? 'not-allowed' : 'pointer',
+                cursor: (loading || aiLoading) ? 'not-allowed' : 'pointer',
                 fontSize: '1rem',
                 fontWeight: '500',
                 minWidth: '150px'
               }}
+              aria-label="Create card"
             >
               {loading ? (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>

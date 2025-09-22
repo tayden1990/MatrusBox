@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../providers';
 
 interface StudyStats {
   cardsStudied: number;
@@ -23,6 +24,7 @@ interface Activity {
 
 export default function Dashboard() {
   const router = useRouter();
+  const { displayName } = useAuth();
   const [stats, setStats] = useState<StudyStats>({
     cardsStudied: 0,
     sessionsToday: 0,
@@ -97,6 +99,8 @@ export default function Dashboard() {
     fetchDashboardData();
   }, [fetchDashboardData]);
 
+  // displayName comes from Auth context
+
   const formatTimeAgo = (date: Date): string => {
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
@@ -117,57 +121,8 @@ export default function Dashboard() {
   };
 
   const handleStartStudy = async () => {
-    setIsStudyMode(true);
-    try {
-      // Start a demo study session
-      const response = await fetch('/api/study/session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          type: 'mixed',
-          limit: 10
-        })
-      });
-
-      if (response.ok) {
-        const sessionData = await response.json();
-        console.log('Study session started:', sessionData);
-        
-        // In a real app, navigate to the study page
-        // router.push(`/study?session=${sessionData.data.id}`);
-        
-        // For demo, simulate study completion
-        setTimeout(() => {
-          const cardsReviewed = Math.floor(Math.random() * 8) + 5;
-          const score = Math.floor(Math.random() * 20) + 75;
-          
-          setStats(prev => ({
-            ...prev,
-            sessionsToday: prev.sessionsToday + 1,
-            cardsStudied: prev.cardsStudied + cardsReviewed
-          }));
-          
-          const newActivity: Activity = {
-            id: Date.now().toString(),
-            type: 'study',
-            description: 'Completed study session',
-            timestamp: 'Just now',
-            score: score,
-            count: cardsReviewed
-          };
-          
-          setActivities(prev => [newActivity, ...prev.slice(0, 4)]);
-          setIsStudyMode(false);
-        }, 3000);
-      } else {
-        throw new Error('Failed to start study session');
-      }
-    } catch (error) {
-      console.error('Study session error:', error);
-      setIsStudyMode(false);
-    }
+    // Navigate to the full Study experience page
+    router.push('/study');
   };
 
   const handleAIGenerate = async () => {
@@ -275,7 +230,14 @@ export default function Dashboard() {
             {stats.dueCards} cards due
           </div>
           <button 
-            onClick={() => router.push('/')}
+            onClick={() => {
+              try {
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                localStorage.removeItem('user');
+              } catch {}
+              router.push('/');
+            }}
             style={{
               backgroundColor: '#ef4444',
               color: 'white',
@@ -316,7 +278,7 @@ export default function Dashboard() {
         }}></div>
         <div style={{ position: 'relative', zIndex: 1 }}>
           <h2 style={{margin: '0 0 12px 0', fontSize: '28px', fontWeight: '700'}}>
-            Welcome back, Alex! 👋
+            Welcome back, {displayName || 'there'}! 👋
           </h2>
           <p style={{margin: '0 0 20px 0', fontSize: '16px', opacity: 0.9}}>
             Ready to continue your learning journey? You&apos;re on a {stats.currentStreak}-day streak!

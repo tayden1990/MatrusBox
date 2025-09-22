@@ -12,10 +12,12 @@ export async function fetchNextCard(sessionId: string) {
 }
 
 export async function submitAnswer(sessionId: string, cardId: string, result: string) {
+  // Map result string to boolean 'correct' as expected by backend DTO
+  const correct = String(result).toLowerCase() === 'correct';
   const res = await fetch(`/api/study/answer`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ sessionId, cardId, result }),
+    body: JSON.stringify({ sessionId, cardId, correct }),
   });
   if (!res.ok) throw new Error("Failed to submit answer");
   return res.json();
